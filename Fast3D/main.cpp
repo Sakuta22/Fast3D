@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Point.h"
 #include "Vector.h"
+#include "Matrix.h"
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -10,7 +11,6 @@
 #include <map>
 using namespace std;
 
-const float M_PI = 3.14159265358979323846;
 HANDLE StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
 struct Point;
@@ -25,28 +25,6 @@ struct Scene;
 struct Render;
 
 void multiplie(Point&, Matrix);
-
-struct Matrix {
-	float matrix[3][3];
-
-	Matrix() : matrix{ {1.f, 0.f, 0.f}, {0.f, 1.f, 0.f}, {0.f, 0.f, 1.f} } {}
-
-	static void CreateRotateMatrix(Matrix &Mat, Vector Axis, float Angle) {
-		Angle *= M_PI / 180.f;
-		
-		Mat.matrix[0][0] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.direction.x, 2.f);
-		Mat.matrix[0][1] = (1 - cos(Angle)) * Axis.direction.x * Axis.direction.y - sin(Angle) * Axis.direction.z;
-		Mat.matrix[0][2] = (1 - cos(Angle)) * Axis.direction.x * Axis.direction.z + sin(Angle) * Axis.direction.y;
-		
-		Mat.matrix[1][0] = (1 - cos(Angle)) * Axis.direction.y * Axis.direction.x + sin(Angle) * Axis.direction.z;
-		Mat.matrix[1][1] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.direction.y, 2.f);
-		Mat.matrix[1][2] = (1 - cos(Angle)) * Axis.direction.y * Axis.direction.z - sin(Angle) * Axis.direction.x;
-
-		Mat.matrix[2][0] = (1 - cos(Angle)) * Axis.direction.z * Axis.direction.x - sin(Angle) * Axis.direction.y;
-		Mat.matrix[2][1] = (1 - cos(Angle)) * Axis.direction.z * Axis.direction.y + sin(Angle) * Axis.direction.x;
-		Mat.matrix[2][2] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.direction.z, 2.f);
-	}
-};
 
 struct Polygonn {
 	vector<Point> plane;
@@ -329,9 +307,9 @@ struct Render {
 
 void multiplie(Point &point, Matrix rotate) {
 	Point Newpoint;
-	Newpoint.x = rotate.matrix[0][0] * point.x + rotate.matrix[0][1] * point.y + rotate.matrix[0][2] * point.z;
-	Newpoint.y = rotate.matrix[1][0] * point.x + rotate.matrix[1][1] * point.y + rotate.matrix[1][2] * point.z;
-	Newpoint.z = rotate.matrix[2][0] * point.x + rotate.matrix[2][1] * point.y + rotate.matrix[2][2] * point.z;
+	Newpoint.x = rotate.data[0][0] * point.x + rotate.data[0][1] * point.y + rotate.data[0][2] * point.z;
+	Newpoint.y = rotate.data[1][0] * point.x + rotate.data[1][1] * point.y + rotate.data[1][2] * point.z;
+	Newpoint.z = rotate.data[2][0] * point.x + rotate.data[2][1] * point.y + rotate.data[2][2] * point.z;
 
 	point.x = Newpoint.x;
 	point.y = Newpoint.y;

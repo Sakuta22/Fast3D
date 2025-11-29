@@ -2,7 +2,7 @@
 #include <iostream>
 #include "Point.h"
 
-struct Vector {
+struct Vector  {
 	Point direction;
 
 	Vector();

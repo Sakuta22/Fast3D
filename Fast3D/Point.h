@@ -1,7 +1,6 @@
 #pragma once
 
-struct Point
-{
+struct Point {
 	float x, y, z;
 
 	Point();
