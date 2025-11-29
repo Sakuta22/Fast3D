@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Point.h"
+#include "Vector.h"
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -25,45 +26,6 @@ struct Render;
 
 void multiplie(Point&, Matrix);
 
-struct Vector {
-	Point xyz;
-
-	Vector() : xyz(0, 0, 1) {}
-	Vector(float same) : xyz(same) {}
-	Vector(float x, float y, float z) : xyz(x, y, z) {}
-	Vector(Point direction) : xyz(direction) {}
-
-	float Length() {
-		return sqrt(this->xyz.x * this->xyz.x + this->xyz.y * this->xyz.y + this->xyz.z * this->xyz.z);
-	}
-	Vector Normalize() {
-		float length = this->Length();
-		return Vector(this->xyz.x / length, this->xyz.y / length, this->xyz.z / length);
-	}
-	void Normalize(Vector &vec) {
-		float length = this->Length();
-		vec.xyz.x = this->xyz.x / length;
-		vec.xyz.y = this->xyz.y / length;
-		vec.xyz.z = this->xyz.z / length;
-	}
-
-	static float GetCos(Vector vec1, Vector vec2) {
-		return Vector::Dot(vec1, vec2) / (vec1.Length() * vec2.Length());
-	}
-
-	static float Dot(Vector vec1, Vector vec2) {
-		return vec1.xyz.x * vec2.xyz.x + vec1.xyz.y * vec2.xyz.y + vec1.xyz.z * vec2.xyz.z;
-	}
-
-	static Vector Cross(Vector vec1, Vector vec2) {
-		return Vector(
-			vec1.xyz.y * vec2.xyz.z - vec1.xyz.z * vec2.xyz.y,
-			vec1.xyz.z * vec2.xyz.x - vec1.xyz.x * vec2.xyz.z,
-			vec1.xyz.x * vec2.xyz.y - vec1.xyz.y * vec2.xyz.x
-		);
-	}
-};
-
 struct Matrix {
 	float matrix[3][3];
 
@@ -72,17 +34,17 @@ struct Matrix {
 	static void CreateRotateMatrix(Matrix &Mat, Vector Axis, float Angle) {
 		Angle *= M_PI / 180.f;
 		
-		Mat.matrix[0][0] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.xyz.x, 2.f);
-		Mat.matrix[0][1] = (1 - cos(Angle)) * Axis.xyz.x * Axis.xyz.y - sin(Angle) * Axis.xyz.z;
-		Mat.matrix[0][2] = (1 - cos(Angle)) * Axis.xyz.x * Axis.xyz.z + sin(Angle) * Axis.xyz.y;
+		Mat.matrix[0][0] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.direction.x, 2.f);
+		Mat.matrix[0][1] = (1 - cos(Angle)) * Axis.direction.x * Axis.direction.y - sin(Angle) * Axis.direction.z;
+		Mat.matrix[0][2] = (1 - cos(Angle)) * Axis.direction.x * Axis.direction.z + sin(Angle) * Axis.direction.y;
 		
-		Mat.matrix[1][0] = (1 - cos(Angle)) * Axis.xyz.y * Axis.xyz.x + sin(Angle) * Axis.xyz.z;
-		Mat.matrix[1][1] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.xyz.y, 2.f);
-		Mat.matrix[1][2] = (1 - cos(Angle)) * Axis.xyz.y * Axis.xyz.z - sin(Angle) * Axis.xyz.x;
+		Mat.matrix[1][0] = (1 - cos(Angle)) * Axis.direction.y * Axis.direction.x + sin(Angle) * Axis.direction.z;
+		Mat.matrix[1][1] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.direction.y, 2.f);
+		Mat.matrix[1][2] = (1 - cos(Angle)) * Axis.direction.y * Axis.direction.z - sin(Angle) * Axis.direction.x;
 
-		Mat.matrix[2][0] = (1 - cos(Angle)) * Axis.xyz.z * Axis.xyz.x - sin(Angle) * Axis.xyz.y;
-		Mat.matrix[2][1] = (1 - cos(Angle)) * Axis.xyz.z * Axis.xyz.y + sin(Angle) * Axis.xyz.x;
-		Mat.matrix[2][2] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.xyz.z, 2.f);
+		Mat.matrix[2][0] = (1 - cos(Angle)) * Axis.direction.z * Axis.direction.x - sin(Angle) * Axis.direction.y;
+		Mat.matrix[2][1] = (1 - cos(Angle)) * Axis.direction.z * Axis.direction.y + sin(Angle) * Axis.direction.x;
+		Mat.matrix[2][2] = cos(Angle) + (1 - cos(Angle)) * pow(Axis.direction.z, 2.f);
 	}
 };
 
@@ -287,8 +249,7 @@ struct Render {
 			Normal = Vector::Cross(vec4, vec3);
 		}
 
-		Normal = Normal.Normalize();
-		return Normal;
+		return Normal.Normalized();
 	}
 
 	void PrintPolygon(Object WorldObject, Camera Cam) {
@@ -487,11 +448,11 @@ int main() {
 	//Sleep(4000);
 	Matrix mat, matx, maty, matz;
 	Vector axis(Point(300.f, 1000.f, 650.f));
-	axis.Normalize(axis);
+	axis.Normalize();
 	Matrix::CreateRotateMatrix(mat, axis, 3.f);
 	Matrix::CreateRotateMatrix(matx, Vector(0.f, 1.f, 0.f), 4.f);
 	Matrix::CreateRotateMatrix(maty, Vector(1.f, 0.f, 0.f), 2.f);
-	Matrix::CreateRotateMatrix(matz, Vector(1.f, 0.33f, 1.f).Normalize(), 2.f);
+	Matrix::CreateRotateMatrix(matz, Vector(1.f, 0.33f, 1.f).Normalized(), 2.f);
 	Screen MScreen;
 	Render render(MScene, MCamera);
 	//render.settings.RenderInvisiblePolygons = true;

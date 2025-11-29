@@ -4,10 +4,100 @@ Point::Point() : x(0.f), y(0.f), z(0.f) {};
 Point::Point(float same) : x(same), y(same), z(same) {};
 Point::Point(float x, float y, float z) : x(x), y(y), z(z) {};
 
-Point Point::operator- (Point& other) const {
+Point& Point::operator=(const Point& other)
+{
+	this->x = other.x;
+	this->y = other.y;
+	this->z = other.z;
+	return *this;
+}
+
+bool Point::operator==(const Point& other) const {
+	return (this->x == other.x && this->y == other.y && this->z == other.z);
+}
+
+bool Point::operator!=(const Point& other) const {
+	return !(*this == other);
+}
+
+Point Point::operator-() const {
+	return Point(-this->x, -this->y, -this->z);
+}
+
+Point Point::operator+(const Point& other) const
+{
+	return Point(this->x + other.x, this->y + other.y, this->z + other.z);
+}
+
+Point& Point::operator+=(const Point& other)
+{
+	this->x += other.x;
+	this->y += other.y;
+	this->z += other.z;
+	return *this;
+}
+
+Point Point::operator-(const Point& other) const
+{
 	return Point(this->x - other.x, this->y - other.y, this->z - other.z);
 }
 
-bool Point::operator== (Point& other) const {
-	return (this->x == other.x && this->y == other.y && this->z == other.z);
+Point& Point::operator-=(const Point& other)
+{
+	this->x -= other.x;
+	this->y -= other.y;
+	this->z -= other.z;
+	return *this;
+}
+
+Point Point::operator+(const float& scalar) const
+{
+	return Point(this->x + scalar, this->y + scalar, this->z + scalar);
+}
+
+Point& Point::operator+=(const float& scalar)
+{
+	this->x += scalar;
+	this->y += scalar;
+	this->z += scalar;
+	return *this;
+}
+
+Point Point::operator-(const float& scalar) const
+{
+	return Point(this->x - scalar, this->y - scalar, this->z - scalar);
+}
+
+Point& Point::operator-=(const float& scalar)
+{
+	this->x -= scalar;
+	this->y -= scalar;
+	this->z -= scalar;
+	return *this;
+}
+
+Point Point::operator*(const float& scalar) const
+{
+	return Point(this->x * scalar, this->y * scalar, this->z * scalar);
+}
+
+Point& Point::operator*=(const float& scalar)
+{
+	this->x *= scalar;
+	this->y *= scalar;
+	this->z *= scalar;
+	return *this;
+}
+
+Point Point::operator/(const float& scalar) const
+{
+	return Point(this->x / scalar, this->y / scalar, this->z / scalar);
+}
+
+Point& Point::operator/=(const float& scalar)
+{
+	this->x /= scalar;
+	this->y /= scalar;
+	this->z /= scalar;
+	return *this;
 }
