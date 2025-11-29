@@ -511,7 +511,7 @@ int main() {
 	Render render(MScene, MCamera);
 	//render.settings.RenderInvisiblePolygons = true;
 	render.camera.MoveToDiff(0.0f, 0.f, 2.5f);
-	int q = 0, qq = 0, w = 0;
+	int q = 0, qq = 0, w = -1;
 	while (true) {
 		w++;
 		if (qq == 1)
