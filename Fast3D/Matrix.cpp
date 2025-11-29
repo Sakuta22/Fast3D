@@ -2,7 +2,7 @@
 
 Matrix::Matrix() : data{ { 1.f, 0.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, 1.f } } {};
 
-void Matrix::CreateRotateMatrix(Matrix& mat, const Vector axis, float angle) {
+void Matrix::CreateRotateMatrix(Matrix& mat, const Vector& axis, float angle) {
 	angle *= M_PI / 180.f;
 
 	mat.data[0][0] = cos(angle) + (1 - cos(angle)) * pow(axis.direction.x, 2.f);
@@ -18,7 +18,7 @@ void Matrix::CreateRotateMatrix(Matrix& mat, const Vector axis, float angle) {
 	mat.data[2][2] = cos(angle) + (1 - cos(angle)) * pow(axis.direction.z, 2.f);
 }
 
-Matrix Matrix::RotateMatrix(const Vector axis, const float angle)
+Matrix Matrix::RotateMatrix(const Vector& axis, float angle)
 {
 	Matrix mat;
 

@@ -1,8 +1,8 @@
 #include "Point.h"
 
 Point::Point() : x(0.f), y(0.f), z(0.f) {};
-Point::Point(float same) : x(same), y(same), z(same) {};
-Point::Point(float x, float y, float z) : x(x), y(y), z(z) {};
+Point::Point(const float same) : x(same), y(same), z(same) {};
+Point::Point(const float x, const float y, const float z) : x(x), y(y), z(z) {};
 
 Point& Point::operator=(const Point& other)
 {
@@ -31,9 +31,7 @@ Point Point::operator+(const Point& other) const
 
 Point& Point::operator+=(const Point& other)
 {
-	this->x += other.x;
-	this->y += other.y;
-	this->z += other.z;
+	*this = *this + other;
 	return *this;
 }
 
@@ -44,9 +42,7 @@ Point Point::operator-(const Point& other) const
 
 Point& Point::operator-=(const Point& other)
 {
-	this->x -= other.x;
-	this->y -= other.y;
-	this->z -= other.z;
+	*this = *this - other;
 	return *this;
 }
 
@@ -57,9 +53,7 @@ Point Point::operator+(const float& scalar) const
 
 Point& Point::operator+=(const float& scalar)
 {
-	this->x += scalar;
-	this->y += scalar;
-	this->z += scalar;
+	*this = *this + scalar;
 	return *this;
 }
 
@@ -70,9 +64,7 @@ Point Point::operator-(const float& scalar) const
 
 Point& Point::operator-=(const float& scalar)
 {
-	this->x -= scalar;
-	this->y -= scalar;
-	this->z -= scalar;
+	*this = *this - scalar;
 	return *this;
 }
 
@@ -83,9 +75,7 @@ Point Point::operator*(const float& scalar) const
 
 Point& Point::operator*=(const float& scalar)
 {
-	this->x *= scalar;
-	this->y *= scalar;
-	this->z *= scalar;
+	*this = *this * scalar;
 	return *this;
 }
 
@@ -96,8 +86,6 @@ Point Point::operator/(const float& scalar) const
 
 Point& Point::operator/=(const float& scalar)
 {
-	this->x /= scalar;
-	this->y /= scalar;
-	this->z /= scalar;
+	*this = *this / scalar;
 	return *this;
 }

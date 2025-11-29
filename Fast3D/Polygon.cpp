@@ -2,4 +2,4 @@
 using namespace Fast3d;
 
 Polygon::Polygon() : data() {};
-Polygon::Polygon(std::vector<Point> data) : data(data) {};
+Polygon::Polygon(const std::vector<Vector> data) : data(data) {};

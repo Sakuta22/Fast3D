@@ -1,14 +1,14 @@
 #pragma once
 #include <vector>
-#include "Point.h"
+#include "Vector.h"
 
 namespace Fast3d {
 
 struct Polygon {
-	std::vector<Point> data;
+	std::vector<Vector> data;
 
 	Polygon();
-	Polygon(std::vector<Point> data);
+	Polygon(const std::vector<Vector> data);
 };
 
 }
