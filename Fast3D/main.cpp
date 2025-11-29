@@ -2,6 +2,7 @@
 #include "Point.h"
 #include "Vector.h"
 #include "Matrix.h"
+#include "Polygon.h"
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -15,9 +16,9 @@ using namespace std;
 using namespace Fast3d;
 
 HANDLE StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
 namespace Fast3d {
 
-	struct Polygon;
 	struct Object;
 	struct Screen;
 	struct ViewPort;
@@ -27,21 +28,14 @@ namespace Fast3d {
 
 	void multiplie(Point&, Matrix);
 
-	struct Polygon {
-		vector<Point> data;
-
-		Polygon() : data() {}
-		Polygon(vector<Point> plane) : data(plane) {}
-	};
-
 	struct Object {
-		vector<Polygon> polygons;
+		vector<Fast3d::Polygon> polygons;
 
 		Object() : polygons() {}
-		Object(vector<Polygon> polygons) : polygons(polygons) {}
+		Object(vector<Fast3d::Polygon> polygons) : polygons(polygons) {}
 
 		void Rotation(Matrix matrix) {
-			for (Polygon& RotatePolygon : polygons) {
+			for (Fast3d::Polygon& RotatePolygon : polygons) {
 				for (Point& RotatePoint : RotatePolygon.data) {
 					multiplie(RotatePoint, matrix);
 				}
@@ -71,8 +65,8 @@ namespace Fast3d {
 
 		Object WorldToViewPort(Object WorldObject) {
 			Object ViewPortObject;
-			for (Polygon WorldPolygon : WorldObject.polygons) {
-				Polygon ViewPortPolygon;
+			for (Fast3d::Polygon WorldPolygon : WorldObject.polygons) {
+				Fast3d::Polygon ViewPortPolygon;
 				for (Point WorldPoint : WorldPolygon.data) {
 					Point ViewPortPoint;
 
@@ -217,7 +211,7 @@ namespace Fast3d {
 			}
 		}
 
-		Vector GetNormale(Polygon& WorldPolygon) {
+		Vector GetNormale(Fast3d::Polygon& WorldPolygon) {
 			Vector vec1(WorldPolygon.data[1] - WorldPolygon.data[0]);
 			Vector vec2(WorldPolygon.data[2] - WorldPolygon.data[0]);
 			Vector Normal = Vector::Cross(vec2, vec1);
