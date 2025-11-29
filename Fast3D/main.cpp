@@ -1,4 +1,5 @@
 #include <iostream>
+#include "Point.h"
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -23,22 +24,6 @@ struct Scene;
 struct Render;
 
 void multiplie(Point&, Matrix);
-
-struct Point {
-	float x, y, z;
-
-	Point() : x(0), y(0), z(0) {}
-	Point(float same) : x(same), y(same), z(same) {}
-	Point(float x, float y, float z) : x(x), y(y), z(z) {}
-
-	Point operator- (Point &other) const {
-		return Point(this->x - other.x, this->y - other.y, this->z - other.z);
-	}
-
-	bool operator== (Point& other) const {
-		return (this->x == other.x && this->y == other.y && this->z == other.z);
-	}
-};
 
 struct Vector {
 	Point xyz;
@@ -513,7 +498,7 @@ int main() {
 	render.camera.MoveToDiff(0.0f, 0.f, 2.5f);
 	int q = 0, qq = 0, w = 0;
 	while (true) {
-		w++;
+		w++; 
 		if (qq == 1)
 			q--;
 		if (qq == 0)
