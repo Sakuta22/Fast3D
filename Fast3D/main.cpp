@@ -5,6 +5,7 @@
 #include "Polygon.h"
 #include "Object.h"
 #include "ViewPort.h"
+#include "Camera.h"
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -19,42 +20,8 @@ using namespace std;
 HANDLE StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
 struct Screen;
-struct Camera;
 struct Scene;
 struct Render;
-
-struct Camera {
-	Point position;
-	Vector direction;
-	ViewPort viewport;
-
-	Camera() : position(), direction(), viewport() {}
-	Camera(Point position, Vector direction, ViewPort viewport) : position(position), direction(direction), viewport(viewport) {}
-
-	void MoveToDiff(float DiffX, float DiffY, float DiffZ) {
-		this->position.x += DiffX;
-		this->position.y += DiffY;
-		this->position.z += DiffZ;
-	}
-
-	Object WorldToViewPort(Object WorldObject) {
-		Object ViewPortObject;
-		for (Fast3d::Polygon WorldPolygon : WorldObject.data) {
-			Fast3d::Polygon ViewPortPolygon;
-			for (Vector WorldVector : WorldPolygon.data) {
-				Vector ViewPortVector;
-
-				ViewPortVector.direction.x = (WorldVector.direction.x - this->position.x) * this->viewport.deep / (WorldVector.direction.z - this->position.z);
-				ViewPortVector.direction.y = (WorldVector.direction.y - this->position.y) * this->viewport.deep / (WorldVector.direction.z - this->position.z);
-				ViewPortVector.direction.z = this->viewport.deep;
-
-				ViewPortPolygon.data.push_back(ViewPortVector);
-			}
-			ViewPortObject.data.push_back(ViewPortPolygon);
-		}
-		return ViewPortObject;
-	}
-};
 
 struct Screen {
 	static int width, height;
