@@ -4,6 +4,7 @@
 #include "Matrix.h"
 #include "Polygon.h"
 #include "Object.h"
+#include "ViewPort.h"
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -17,35 +18,10 @@ using namespace std;
 
 HANDLE StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
-struct Object;
 struct Screen;
-struct ViewPort;
 struct Camera;
 struct Scene;
 struct Render;
-
-void multiplie(Vector&, Matrix);
-
-//struct Object {
-//	vector<Fast3d::Polygon> data;
-//
-//	Object() : data() {}
-//	Object(vector<Fast3d::Polygon> data) : data(data) {}
-//
-//	void Rotation(Matrix matrix) {
-//		for (Fast3d::Polygon& RotatePolygon : data) {
-//			for (Vector& RotatePoint : RotatePolygon.data) {
-//				multiplie(RotatePoint, matrix);
-//			}
-//		}
-//	}
-//};
-
-struct ViewPort {
-	float width, height, deep;
-
-	ViewPort() : width(1.f), height(1.f), deep(1.f) {}
-};
 
 struct Camera {
 	Point position;
@@ -297,17 +273,6 @@ struct Render {
 		WriteConsoleOutputCharacterW(buffer, Screen::screen, Screen::width * Screen::height, { 0, 0 }, &useless);
 	}
 };
-
-void multiplie(Point& point, Matrix rotate) {
-	Point Newpoint;	
-	Newpoint.x = rotate.data[0][0] * point.x + rotate.data[0][1] * point.y + rotate.data[0][2] * point.z;
-	Newpoint.y = rotate.data[1][0] * point.x + rotate.data[1][1] * point.y + rotate.data[1][2] * point.z;
-	Newpoint.z = rotate.data[2][0] * point.x + rotate.data[2][1] * point.y + rotate.data[2][2] * point.z;
-
-	point.x = Newpoint.x;
-	point.y = Newpoint.y;
-	point.z = Newpoint.z;
-}
 
 vector<Fast3d::Polygon> generateSphere(float radius, int rings, int sectors) {
 	vector<Fast3d::Polygon> spherePolys;
