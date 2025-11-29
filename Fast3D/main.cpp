@@ -6,6 +6,7 @@
 #include "Object.h"
 #include "ViewPort.h"
 #include "Camera.h"
+#include "Scene.h"
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -127,13 +128,6 @@ float Screen::AspectRatio = 0.0f;
 float Screen::PixelRatio = 0.0f;
 wchar_t* Screen::screen = nullptr;
 
-struct Scene {
-	vector<Object> scene;
-
-	Scene() : scene() {}
-	Scene(vector<Object> scene) : scene(scene) {}
-};
-
 struct Render {
 	struct Settings {
 		bool RenderInvisiblePolygons = false;
@@ -146,7 +140,7 @@ struct Render {
 	Render(Scene scene, Camera camera) : scene(scene), camera(camera) {}
 
 	void Start(HANDLE& buffer) {
-		for (Object WorldObject : scene.scene) {
+		for (Object WorldObject : scene.data) {
 			this->PrintPolygon(WorldObject, this->camera);
 			this->FillBuffer(buffer);
 		}
@@ -375,14 +369,14 @@ int main() {
 		//if (w % 20 == 0)
 		MScreen.SetScreenNow();
 
-		render.scene.scene[0].Rotation(mat);
+		render.scene.data[0].Rotation(mat);
 		//render.scene.scene[0].Rotation(matz);
-		render.scene.scene[1].Rotation(matx);
-		render.scene.scene[1].Rotation(matz);
+		render.scene.data[1].Rotation(matx);
+		render.scene.data[1].Rotation(matz);
 		//render.scene.scene[1].Rotation(mat);
 		//render.scene.scene[2].Rotation(matx);
-		render.scene.scene[2].Rotation(maty);
-		render.scene.scene[2].Rotation(matz);
+		render.scene.data[2].Rotation(maty);
+		render.scene.data[2].Rotation(matz);
 		//render.camera.MoveToDiff((qq == 0 ? -0.05f : 0.05f), (qq == 1 ? -0.02f : 0.02f), (qq == 1 ? -0.05f : 0.05f));
 
 		render.Start(MScreen.Buffers[1 - MScreen.ActiveBuffer]);
