@@ -7,6 +7,7 @@
 #include "ViewPort.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "Screen.h"
 #include <iomanip>
 #include <cmath>
 #include <algorithm>
@@ -14,119 +15,11 @@
 #include <Windows.h>
 #include <vector>
 #include <map>
-namespace Fast3d {} ;
-
 using namespace std;
 
-HANDLE StdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+namespace Fast3d {} ;
 
-struct Screen;
-struct Scene;
 struct Render;
-
-struct Screen {
-	static int width, height;
-	static float AspectRatio, PixelRatio;
-	static wchar_t* screen;
-	HANDLE Buffers[2];
-	int ActiveBuffer;
-
-	Screen() : ActiveBuffer(0) {
-		this->Buffers[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-		this->Buffers[1] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-
-		CONSOLE_CURSOR_INFO cursorInfo;
-		GetConsoleCursorInfo(this->Buffers[0], &cursorInfo);
-		cursorInfo.bVisible = FALSE;
-		SetConsoleCursorInfo(this->Buffers[0], &cursorInfo);
-		SetConsoleCursorInfo(this->Buffers[1], &cursorInfo);
-
-		SetScreenNow();
-		screen = new wchar_t[this->width * this->height];
-		FreeScreen();
-		SetAspect();
-	}
-
-	bool isBufferChange() {
-		CONSOLE_SCREEN_BUFFER_INFO Info;
-		GetConsoleScreenBufferInfo(StdOut, &Info);
-
-		int Iwidth = Info.srWindow.Right - Info.srWindow.Left + 1;
-		int Iheight = Info.srWindow.Bottom - Info.srWindow.Top + 1;
-
-		if (Iwidth != this->width && Iheight != this->height)
-			return true;
-		return false;
-	}
-
-	void FreeScreen() {
-		if (screen) {
-			wmemset(screen, L' ', width * height);
-		}
-	}
-
-	void SetAspect() {
-		AspectRatio = (float)this->height / (float)this->width;
-		PixelRatio = 24.f / 11.f;
-	}
-
-	void SetScreenNow() {
-		CONSOLE_SCREEN_BUFFER_INFO Info;
-		GetConsoleScreenBufferInfo(this->Buffers[this->ActiveBuffer], &Info);
-
-		int newW = Info.srWindow.Right - Info.srWindow.Left + 1;
-		int newH = Info.srWindow.Bottom - Info.srWindow.Top + 1;
-
-		if (newW != this->width || newH != this->height) {
-			this->width = newW;
-			this->height = newH;
-
-			if (screen) delete[] screen;
-			screen = new wchar_t[this->width * this->height];
-
-			this->SetAspect();
-
-			/*CloseHandle(this->Buffers[0]);
-			CloseHandle(this->Buffers[1]);
-			this->Buffers[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-			this->Buffers[1] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);*/
-
-			COORD coord = { this->width, this->height };
-			SetConsoleScreenBufferSize(this->Buffers[0], coord);
-			SetConsoleScreenBufferSize(this->Buffers[1], coord);
-
-			SMALL_RECT rect;
-			rect.Left = 0;
-			rect.Top = 0;
-			rect.Right = this->width - 1;
-			rect.Bottom = this->height - 1;
-			SetConsoleWindowInfo(this->Buffers[0], TRUE, &rect);
-			SetConsoleWindowInfo(this->Buffers[1], TRUE, &rect);
-		}
-
-		FreeScreen();
-	}
-
-	void SetBuffer(HANDLE Handle)
-	{
-		_COORD coord = { this->width, this->height };
-		SetConsoleScreenBufferSize(Handle, coord);
-
-		_SMALL_RECT Rect = { 0, 0, this->width - 1, this->height - 1 };
-		SetConsoleWindowInfo(Handle, TRUE, &Rect);
-	}
-
-	void SwapBuffers() {
-		SetConsoleActiveScreenBuffer(this->Buffers[1 - this->ActiveBuffer]);
-		this->ActiveBuffer = 1 - this->ActiveBuffer;
-		FreeScreen();
-	}
-};
-int Screen::width = 0;
-int Screen::height = 0;
-float Screen::AspectRatio = 0.0f;
-float Screen::PixelRatio = 0.0f;
-wchar_t* Screen::screen = nullptr;
 
 struct Render {
 	struct Settings {
