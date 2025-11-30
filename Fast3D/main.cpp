@@ -1,132 +1,8 @@
 #include <iostream>
-#include "Point.h"
-#include "Vector.h"
-#include "Matrix.h"
-#include "Polygon.h"
-#include "Object.h"
-#include "ViewPort.h"
-#include "Camera.h"
-#include "Scene.h"
-#include "Screen.h"
-#include <iomanip>
-#include <cmath>
-#include <algorithm>
-#include <string>
+#include "Render/Render.h"
 #include <Windows.h>
 #include <vector>
-#include <map>
 using namespace std;
-
-namespace Fast3d {} ;
-
-struct Render;
-
-struct Render {
-	struct Settings {
-		bool RenderInvisiblePolygons = false;
-	};
-
-	Settings settings;
-	Scene scene;
-	Camera camera;
-
-	Render(Scene scene, Camera camera) : scene(scene), camera(camera) {}
-
-	void Start(HANDLE& buffer) {
-		for (Object WorldObject : scene.data) {
-			this->PrintPolygon(WorldObject, this->camera);
-			this->FillBuffer(buffer);
-		}
-	}
-
-	Vector GetNormale(Fast3d::Polygon& WorldPolygon) {
-		Vector vec1(WorldPolygon.data[1] - WorldPolygon.data[0]);
-		Vector vec2(WorldPolygon.data[2] - WorldPolygon.data[0]);
-		Vector Normal = Vector::Cross(vec2, vec1);
-
-		if (Normal.Length() < 0.00001f) {
-			Vector vec3(WorldPolygon.data[2] - WorldPolygon.data[0]);
-			Vector vec4(WorldPolygon.data[3] - WorldPolygon.data[0]);
-			Normal = Vector::Cross(vec4, vec3);
-		}
-
-		return Normal.Normalized();
-	}
-
-	void PrintPolygon(Object WorldObject, Camera Cam) {
-		for (Fast3d::Polygon WorldPolygon : WorldObject.data) {
-			if (!this->settings.RenderInvisiblePolygons) {
-				Vector Normal = this->GetNormale(WorldPolygon);
-				Vector ViewCam(Vector(this->camera.position) - WorldPolygon.data[0]);
-
-				float DotProduct = Vector::Dot(Normal, ViewCam);
-				if (DotProduct > 0.f)
-					continue;
-			}
-
-			Fast3d::Polygon BufferPolygon;
-			for (Vector WorldVector : WorldPolygon.data) {
-				//WORLDVECTOR TO VIEWPORTVECTOR
-				Vector ViewPortVector;
-				ViewPortVector.direction.x = (WorldVector.direction.x - Cam.position.x) * Cam.viewport.deep / (WorldVector.direction.z - Cam.position.z);
-				ViewPortVector.direction.y = (WorldVector.direction.y - Cam.position.y) * Cam.viewport.deep / (WorldVector.direction.z - Cam.position.z);
-				ViewPortVector.direction.z = Cam.viewport.deep;
-
-				//VIEWPORTVECTOR TO BUFFERPOINT
-				ViewPortVector.direction.x *= Screen::AspectRatio * Screen::PixelRatio;
-				Point BufferPoint;
-				BufferPoint.x = Screen::width * (ViewPortVector.direction.x + Cam.viewport.width / 2.f);
-				BufferPoint.y = Screen::height * (-ViewPortVector.direction.y + Cam.viewport.height / 2.f);
-
-				//PUSH TO BUFFERNPOINT TO BUFFERPOLYGON
-				BufferPolygon.data.push_back(BufferPoint);
-			}
-
-			int BPS = BufferPolygon.data.size();
-			for (int i = 0; i < BPS; i++) {
-				Point ScreenPoint1 = BufferPolygon.data[i].direction;
-				Point ScreenPoint2 = BufferPolygon.data[(i + 1) % BPS].direction;
-
-				PrintLine(ScreenPoint1, ScreenPoint2);
-			}
-		}
-	}
-
-	void PrintLine(Point p1, Point p2) {
-		if (p1.y > p2.y)
-			swap(p1, p2);
-
-		if (abs(p2.x - p1.x) > abs(p2.y - p1.y)) {
-			float y = p1.y, dy = abs((p2.y - p1.y) / (p2.x - p1.x));
-			p1.x = round(p1.x), p2.x = round(p2.x);
-			if (p1.x <= p2.x) {
-				for (int x = p1.x; x <= p2.x; x++, y += dy) {
-					if ((0 <= x && x < Screen::width) && (0 <= round(y) && round(y) < Screen::height))
-						Screen::screen[int(Screen::width * round(y) + x)] = '*';
-				}
-			}
-			else {
-				for (int x = p1.x; x >= p2.x; x--, y += dy) {
-					if ((0 <= x && x < Screen::width) && (0 <= round(y) && round(y) < Screen::height))
-						Screen::screen[int(Screen::width * round(y) + x)] = '*';
-				}
-			}
-		}
-		else {
-			float x = p1.x, dx = (p2.y - p1.y == 0.f ? 0.f : (p2.x - p1.x) / (p2.y - p1.y));
-			p1.y = round(p1.y), p2.y = round(p2.y);
-			for (int y = p1.y; y <= p2.y; y++, x += dx) {
-				if ((0 <= round(x) && round(x) < Screen::width) && (0 <= y && y < Screen::height))
-					Screen::screen[int(Screen::width * y + round(x))] = '*';
-			}
-		}
-	}
-
-	void FillBuffer(HANDLE& buffer) {
-		DWORD useless = NULL;
-		WriteConsoleOutputCharacterW(buffer, Screen::screen, Screen::width * Screen::height, { 0, 0 }, &useless);
-	}
-};
 
 vector<Fast3d::Polygon> generateSphere(float radius, int rings, int sectors) {
 	vector<Fast3d::Polygon> spherePolys;
@@ -246,6 +122,7 @@ int main() {
 	Screen MScreen;
 	Render render(MScene, MCamera);
 	//render.settings.RenderInvisiblePolygons = true;
+	Render::Settings::RenderInvisiblePolygons = false;
 	render.camera.MoveToDiff(0.0f, 0.f, 2.5f);
 	int q = 0, qq = 0, w = 0;
 	while (true) {

@@ -1,7 +1,7 @@
 #pragma once
-#include "Point.h"
-#include "Vector.h"
-#include "ViewPort.h"
+#include "../Point/Point.h"
+#include "../Vector/Vector.h"
+#include "../ViewPort/ViewPort.h"
 
 struct Camera {
 	Point position;

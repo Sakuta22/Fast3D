@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "Object.h"
+#include "../Object/Object.h"
 
 struct Scene {
 	std::vector<Object> data;

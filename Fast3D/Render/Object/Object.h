@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "Matrix.h"
-#include "Polygon.h"
+#include "../Matrix/Matrix.h"
+#include "../Polygon/Polygon.h"
 
 struct Object {
 	std::vector<Fast3d::Polygon> data;

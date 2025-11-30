@@ -1,5 +1,5 @@
 #pragma once
-#include "Vector.h"
+#include "../Vector/Vector.h"
 
 const float M_PI = 3.14159265358979323846;
 

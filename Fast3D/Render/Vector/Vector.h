@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
-#include "Point.h"
-#include "Matrix.h"
+#include "../Point/Point.h"
+#include "../Matrix/Matrix.h"
 
 struct Matrix;
 

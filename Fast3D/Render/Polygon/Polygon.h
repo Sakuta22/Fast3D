@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "Vector.h"
+#include "../Vector/Vector.h"
 
 namespace Fast3d {
 
