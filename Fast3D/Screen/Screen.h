@@ -2,6 +2,8 @@
 #include <iostream>
 #include <Windows.h>
 
+namespace Console3D {
+
 struct Screen {
 	static int width, height;
 	static float AspectRatio, PixelRatio;
@@ -18,3 +20,5 @@ struct Screen {
 	void FreeScreen();
 	void SwapBuffers();
 };
+
+}

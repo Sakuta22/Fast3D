@@ -1,4 +1,5 @@
 #include "Matrix.h"
+using namespace Console3D;
 
 Matrix::Matrix() : data{ { 1.f, 0.f, 0.f }, { 0.f, 1.f, 0.f }, { 0.f, 0.f, 1.f } } {};
 

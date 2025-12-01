@@ -11,6 +11,8 @@
 
 #include "../Screen/Screen.h"
 
+namespace Console3D {
+
 struct Render {
 	static struct Settings {
 		static bool RenderInvisiblePolygons;
@@ -23,7 +25,7 @@ struct Render {
 
 	void Start(HANDLE& buffer) const;
 
-	Vector GetNormale(const Fast3d::Polygon& WorldPolygon) const;
+	Vector GetNormale(const Console3D::Polygon& WorldPolygon) const;
 
 	void PrintPolygon(const Object WorldObject) const;
 
@@ -31,3 +33,5 @@ struct Render {
 
 	void FillBuffer(HANDLE& buffer) const;
 };
+
+}

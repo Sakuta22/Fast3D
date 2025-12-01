@@ -1,4 +1,5 @@
 #include "Render.h"
+using namespace Console3D;
 
 Render::Render(Scene scene, Camera camera) : scene(scene), camera(camera) {}
 
@@ -9,7 +10,7 @@ void Render::Start(HANDLE& buffer) const {
 	}
 }
 
-Vector Render::GetNormale(const Fast3d::Polygon& WorldPolygon) const {
+Vector Render::GetNormale(const Console3D::Polygon& WorldPolygon) const {
 	Vector vec1(WorldPolygon.data[1] - WorldPolygon.data[0]);
 	Vector vec2(WorldPolygon.data[2] - WorldPolygon.data[0]);
 	Vector Normal = Vector::Cross(vec2, vec1);
@@ -24,7 +25,7 @@ Vector Render::GetNormale(const Fast3d::Polygon& WorldPolygon) const {
 }
 
 void Render::PrintPolygon(const Object WorldObject) const {
-	for (Fast3d::Polygon WorldPolygon : WorldObject.data) {
+	for (Console3D::Polygon WorldPolygon : WorldObject.data) {
 		if (!Render::Settings::RenderInvisiblePolygons) {
 			Vector Normal = this->GetNormale(WorldPolygon);
 			Vector ViewCam(Vector(this->camera.position) - WorldPolygon.data[0]);
@@ -34,7 +35,7 @@ void Render::PrintPolygon(const Object WorldObject) const {
 				continue;
 		}
 
-		Fast3d::Polygon BufferPolygon;
+		Console3D::Polygon BufferPolygon;
 		for (Vector WorldVector : WorldPolygon.data) {
 			//WORLDVECTOR TO VIEWPORTVECTOR
 			Vector ViewPortVector;

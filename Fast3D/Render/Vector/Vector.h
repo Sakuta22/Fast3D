@@ -3,6 +3,8 @@
 #include "../Point/Point.h"
 #include "../Matrix/Matrix.h"
 
+namespace Console3D {
+
 struct Matrix;
 
 struct Vector  {
@@ -33,3 +35,5 @@ struct Vector  {
 	static float  Dot(const Vector& vec1, const Vector& vec2);
 	static Vector Cross(const Vector& vec1, const Vector& vec2);
 };
+
+}

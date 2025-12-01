@@ -1,4 +1,5 @@
 #include "Vector.h"
+using namespace Console3D;
 
 Vector::Vector() : direction(0.f, 0.f, 1.f) {};
 Vector::Vector(const float same) : direction(same, same, same) {};

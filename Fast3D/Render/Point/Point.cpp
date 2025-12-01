@@ -1,4 +1,5 @@
 #include "Point.h"
+using namespace Console3D;
 
 Point::Point() : x(0.f), y(0.f), z(0.f) {};
 Point::Point(const float same) : x(same), y(same), z(same) {};

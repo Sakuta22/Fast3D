@@ -3,9 +3,10 @@
 #include <Windows.h>
 #include <vector>
 using namespace std;
+using namespace Console3D;
 
-vector<Fast3d::Polygon> generateSphere(float radius, int rings, int sectors) {
-	vector<Fast3d::Polygon> spherePolys;
+vector<Console3D::Polygon> generateSphere(float radius, int rings, int sectors) {
+	vector<Console3D::Polygon> spherePolys;
 	const float PI = 3.14159265359f;
 
 	for (int i = 0; i < rings; ++i) {
@@ -40,7 +41,7 @@ vector<Fast3d::Polygon> generateSphere(float radius, int rings, int sectors) {
 
 			// Создаем полигон (порядок точек важен для нормалей, здесь CCW)
 			// Формируем грань из 4-х точек
-			spherePolys.push_back(Fast3d::Polygon(vector<Vector>{
+			spherePolys.push_back(Console3D::Polygon(vector<Vector>{
 				Point(x3, y3, z1),  // Верх-Лево
 					Point(x2, y2, z1), // Верх-Право
 					Point(x1, y1, z0), // Низ-Право
@@ -51,8 +52,8 @@ vector<Fast3d::Polygon> generateSphere(float radius, int rings, int sectors) {
 	return spherePolys;
 }
 
-std::vector<Fast3d::Polygon> generateTorus(float radius, float tubeRadius, int segments, int sides) {
-	std::vector<Fast3d::Polygon> torusPolys;
+std::vector<Console3D::Polygon> generateTorus(float radius, float tubeRadius, int segments, int sides) {
+	std::vector<Console3D::Polygon> torusPolys;
 	const float PI = 3.14159265359f;
 
 	for (int i = 0; i < segments; ++i) {
@@ -81,7 +82,7 @@ std::vector<Fast3d::Polygon> generateTorus(float radius, float tubeRadius, int s
 
 			// Добавляем полигон
 			// Порядок вершин: CW (по часовой стрелке), чтобы соответствовать вашему кубу
-			torusPolys.push_back(Fast3d::Polygon(std::vector<Vector>{
+			torusPolys.push_back(Console3D::Polygon(std::vector<Vector>{
 				p3, // Верх-Лево
 					p0, // Низ-Лево
 					p1,  // Низ-Право
@@ -93,19 +94,19 @@ std::vector<Fast3d::Polygon> generateTorus(float radius, float tubeRadius, int s
 }
 
 int main() {
-	vector<Fast3d::Polygon> cube = {
-		Fast3d::Polygon(vector<Vector> {Point(-0.5f, -0.5f, -0.5f), Point(-0.5f,  0.5f, -0.5f), Point(0.5f,  0.5f, -0.5f), Point(0.5f, -0.5f, -0.5f)}), //front
-		Fast3d::Polygon(vector<Vector> {Point(0.5f,  0.5f, -0.5f), Point(0.5f,  0.5f,  0.5f), Point(0.5f, -0.5f,  0.5f), Point(0.5f, -0.5f, -0.5f)}), //right
-		Fast3d::Polygon(vector<Vector> {Point(-0.5f, -0.5f,  0.5f), Point(0.5f, -0.5f,  0.5f), Point(0.5f,  0.5f,  0.5f), Point(-0.5f,  0.5f,  0.5f)}), //back
-		Fast3d::Polygon(vector<Vector> {Point(-0.5f,  0.5f, -0.5f), Point(-0.5f, -0.5f, -0.5f), Point(-0.5f, -0.5f,  0.5f), Point(-0.5f,  0.5f,  0.5f)}), //left
-		Fast3d::Polygon(vector<Vector> {Point(-0.5f,  0.5f,  0.5f), Point(0.5f,  0.5f,  0.5f), Point(0.5f,  0.5f, -0.5f), Point(-0.5f,  0.5f, -0.5f)}), //top
-		Fast3d::Polygon(vector<Vector> {Point(-0.5f, -0.5f, -0.5f), Point(0.5f, -0.5f, -0.5f), Point(0.5f, -0.5f,  0.5f), Point(-0.5f, -0.5f,  0.5f)}), //bottom
+	vector<Console3D::Polygon> cube = {
+		Console3D::Polygon(vector<Vector> {Point(-0.5f, -0.5f, -0.5f), Point(-0.5f,  0.5f, -0.5f), Point(0.5f,  0.5f, -0.5f), Point(0.5f, -0.5f, -0.5f)}), //front
+		Console3D::Polygon(vector<Vector> {Point(0.5f,  0.5f, -0.5f), Point(0.5f,  0.5f,  0.5f), Point(0.5f, -0.5f,  0.5f), Point(0.5f, -0.5f, -0.5f)}), //right
+		Console3D::Polygon(vector<Vector> {Point(-0.5f, -0.5f,  0.5f), Point(0.5f, -0.5f,  0.5f), Point(0.5f,  0.5f,  0.5f), Point(-0.5f,  0.5f,  0.5f)}), //back
+		Console3D::Polygon(vector<Vector> {Point(-0.5f,  0.5f, -0.5f), Point(-0.5f, -0.5f, -0.5f), Point(-0.5f, -0.5f,  0.5f), Point(-0.5f,  0.5f,  0.5f)}), //left
+		Console3D::Polygon(vector<Vector> {Point(-0.5f,  0.5f,  0.5f), Point(0.5f,  0.5f,  0.5f), Point(0.5f,  0.5f, -0.5f), Point(-0.5f,  0.5f, -0.5f)}), //top
+		Console3D::Polygon(vector<Vector> {Point(-0.5f, -0.5f, -0.5f), Point(0.5f, -0.5f, -0.5f), Point(0.5f, -0.5f,  0.5f), Point(-0.5f, -0.5f,  0.5f)}), //bottom
 	};
 	Object Cube(cube);
 
-	std::vector<Fast3d::Polygon> torus = generateTorus(1.5f, 0.33f, 30, 30);
-	vector<Fast3d::Polygon> sphereData = generateSphere(0.5f, 12, 12);
-	vector<Fast3d::Polygon> sphereData1 = generateSphere(0.50f, 6, 6);
+	std::vector<Console3D::Polygon> torus = generateTorus(1.5f, 0.33f, 60, 60);
+	vector<Console3D::Polygon> sphereData = generateSphere(0.5f, 24, 24);
+	vector<Console3D::Polygon> sphereData1 = generateSphere(0.50f, 6, 6);
 	Scene MScene({ torus, sphereData, cube });
 	//Scene MScene({Cube});
 

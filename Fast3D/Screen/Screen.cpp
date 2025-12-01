@@ -1,4 +1,5 @@
 #include "Screen.h"
+using namespace Console3D;
 
 Screen::Screen() : ActiveBuffer(0) {
 	this->Buffers[0] = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);

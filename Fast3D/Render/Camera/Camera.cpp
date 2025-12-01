@@ -1,4 +1,5 @@
 #include "Camera.h"
+using namespace Console3D;
 
 Camera::Camera() : position(), direction(), viewport() {}
 Camera::Camera(const Point position, const Vector direction, const ViewPort viewport) : position(position), direction(direction), viewport(viewport) {}

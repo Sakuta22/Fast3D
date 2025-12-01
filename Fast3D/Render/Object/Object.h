@@ -3,11 +3,15 @@
 #include "../Matrix/Matrix.h"
 #include "../Polygon/Polygon.h"
 
+namespace Console3D {
+
 struct Object {
-	std::vector<Fast3d::Polygon> data;
+	std::vector<Console3D::Polygon> data;
 
 	Object();
-	Object(const std::vector<Fast3d::Polygon> data);
+	Object(const std::vector<Console3D::Polygon> data);
 
 	void Rotation(const Matrix& mat);
 };
+
+}

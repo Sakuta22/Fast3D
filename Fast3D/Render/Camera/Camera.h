@@ -3,6 +3,8 @@
 #include "../Vector/Vector.h"
 #include "../ViewPort/ViewPort.h"
 
+namespace Console3D {
+
 struct Camera {
 	Point position;
 	Vector direction;
@@ -13,3 +15,5 @@ struct Camera {
 
 	void MoveToDiff(const float diffx, const float diffy, const float diffz);
 };
+
+}

@@ -2,7 +2,7 @@
 #include <vector>
 #include "../Vector/Vector.h"
 
-namespace Fast3d {
+namespace Console3D {
 
 struct Polygon {
 	std::vector<Vector> data;

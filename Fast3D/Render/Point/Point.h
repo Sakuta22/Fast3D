@@ -1,5 +1,7 @@
 #pragma once
 
+namespace Console3D {
+
 struct Point {
 	float x, y, z;
 
@@ -26,3 +28,5 @@ struct Point {
 	Point  operator/  (const float& scalar) const;
 	Point& operator/= (const float& scalar);
 };
+
+}
