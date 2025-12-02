@@ -4,6 +4,7 @@
 #include "Vector/Vector.h"
 #include "Matrix/Matrix.h"
 #include "Polygon/Polygon.h"
+#include "Primitives/Primitives.h"
 #include "Object/Object.h"
 #include "ViewPort/ViewPort.h"
 #include "Camera/Camera.h"

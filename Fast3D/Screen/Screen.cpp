@@ -1,4 +1,4 @@
-#include "Screen.h"
+﻿#include "Screen.h"
 using namespace Console3D;
 
 Screen::Screen() : ActiveBuffer(0) {
