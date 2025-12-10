@@ -32,7 +32,6 @@ int main() {
 
 	Render render(MScene, MCamera);
 	//render.settings.windingOrder = Render::WindingOrder::CounterClockwise;
-	
 	while (true) {
 		MScreen.SetScreenNow();
 
