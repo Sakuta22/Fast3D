@@ -15,10 +15,6 @@
 namespace Console3D {
 
 struct Render {
-	static struct Settings {
-		static bool RenderInvisiblePolygons;
-	};
-
 	Scene scene;
 	Camera camera;
 
@@ -33,6 +29,23 @@ struct Render {
 	void PrintLine(Point p1, Point p2) const;
 
 	void FillBuffer(HANDLE& buffer) const;
+
+	enum class CullMode {
+		None,
+		Front,
+		Back
+	};
+	enum class WindingOrder {
+		Clockwise,
+		CounterClockwise
+	};
+//private:
+	struct Settings {
+		Render::CullMode cullMode = Render::CullMode::Back;
+		Render::WindingOrder windingOrder = Render::WindingOrder::Clockwise;
+	};
+
+	Settings settings;
 };
 
 }

@@ -68,6 +68,6 @@ void Screen::SwapBuffers() {
 
 int Screen::width = 0;
 int Screen::height = 0;
-float Screen::AspectRatio = 0.0f;
-float Screen::PixelRatio = 0.0f;
+float Screen::AspectRatio = 1.0f;
+float Screen::PixelRatio = 1.0f;
 wchar_t* Screen::screen = nullptr;

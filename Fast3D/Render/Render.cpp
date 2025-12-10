@@ -13,12 +13,29 @@ void Render::Start(HANDLE& buffer) const {
 Vector Render::GetNormale(const Console3D::Polygon& WorldPolygon) const {
 	Vector vec1(WorldPolygon.data[1] - WorldPolygon.data[0]);
 	Vector vec2(WorldPolygon.data[2] - WorldPolygon.data[0]);
-	Vector Normal = Vector::Cross(vec2, vec1);
+	Vector Normal;
+	switch (this->settings.windingOrder)
+	{
+	case Render::WindingOrder::Clockwise:
+		Normal = Vector::Cross(vec2, vec1);
+		break;
+	case Render::WindingOrder::CounterClockwise:
+		Normal = Vector::Cross(vec1, vec2);
+		break;
+	}
 
 	if (Normal.Length() < 0.00001f) {
 		Vector vec3(WorldPolygon.data[2] - WorldPolygon.data[0]);
 		Vector vec4(WorldPolygon.data[3] - WorldPolygon.data[0]);
-		Normal = Vector::Cross(vec4, vec3);
+		switch (this->settings.windingOrder)
+		{
+		case Render::WindingOrder::Clockwise:
+			Normal = Vector::Cross(vec4, vec3);
+			break;
+		case Render::WindingOrder::CounterClockwise:
+			Normal = Vector::Cross(vec3, vec4);
+			break;
+		}
 	}
 
 	return Normal.Normalized();
@@ -26,13 +43,20 @@ Vector Render::GetNormale(const Console3D::Polygon& WorldPolygon) const {
 
 void Render::PrintPolygon(const Object WorldObject) const {
 	for (Console3D::Polygon WorldPolygon : WorldObject.data) {
-		if (!Render::Settings::RenderInvisiblePolygons) {
+		if (this->settings.cullMode != Render::CullMode::None) {
 			Vector Normal = this->GetNormale(WorldPolygon);
 			Vector ViewCam(Vector(this->camera.position) - WorldPolygon.data[0]);
 
 			float DotProduct = Vector::Dot(Normal, ViewCam);
-			if (DotProduct > 0.f)
-				continue;
+			switch (this->settings.cullMode)
+			{
+			case Render::CullMode::Front:
+				if (DotProduct < 0.f)
+					continue;
+			case Render::CullMode::Back:
+				if (DotProduct > 0.f)
+					continue;
+			}
 		}
 
 		Console3D::Polygon BufferPolygon;
@@ -97,5 +121,3 @@ void Render::FillBuffer(HANDLE& buffer) const {
 	DWORD useless = NULL;
 	WriteConsoleOutputCharacterW(buffer, Screen::screen, Screen::width * Screen::height, { 0, 0 }, &useless);
 }
-
-bool Render::Settings::RenderInvisiblePolygons = false;
