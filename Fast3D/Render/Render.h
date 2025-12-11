@@ -18,17 +18,31 @@ struct Render {
 	Scene scene;
 	Camera camera;
 
+	
+
+	//struct ZBuffer { //Hidden Surface Removal
+	//	float* fBuffer;
+	//	float* zBuffer;
+	//	float size;
+
+	//	ZBuffer(wchar_t& frameBuffer, float& size) : size(size) {
+	//		fBuffer = frameBuffer;
+	//		zBuffer = new float[size];
+	//	}
+
+
+	//};
+	//ZBuffer zBuffer;
+
 	Render(Scene scene, Camera camera);
 
-	void Start(HANDLE& buffer) const;
+	void Start(wchar_t* buffer, const int& width, const int& height, const float& aspectRatio, const float& pixelRatio) const;
 
 	Vector GetNormale(const Console3D::Polygon& WorldPolygon) const;
 
-	void PrintPolygon(const Object WorldObject) const;
+	void PrintPolygon(const Object WorldObject, wchar_t* buffer, const int& width, const int& height, const float& aspectRatio, const float& pixelRatio) const;
 
-	void PrintLine(Point p1, Point p2) const;
-
-	void FillBuffer(HANDLE& buffer) const;
+	void PrintLine(Point p1, Point p2, wchar_t* buffer, const int& width, const int& height) const;
 
 	enum class CullMode {
 		None,

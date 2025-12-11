@@ -66,8 +66,8 @@ void Screen::SwapBuffers() {
 	FreeScreen();
 }
 
-int Screen::width = 0;
-int Screen::height = 0;
-float Screen::AspectRatio = 1.0f;
-float Screen::PixelRatio = 1.0f;
-wchar_t* Screen::screen = nullptr;
+void Screen::FillBuffer()
+{
+	DWORD useless = NULL;
+	WriteConsoleOutputCharacterW(this->Buffers[1 - this->ActiveBuffer], this->screen, this->width * this->height, {0, 0}, &useless);
+}

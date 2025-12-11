@@ -43,7 +43,8 @@ int main() {
 		render.scene.data[2].Rotation(maty);
 		render.scene.data[2].Rotation(matz);
 
-		render.Start(MScreen.Buffers[1 - MScreen.ActiveBuffer]);
+		render.Start(MScreen.screen, MScreen.width, MScreen.height, MScreen.AspectRatio, MScreen.PixelRatio);
+		MScreen.FillBuffer();
 		MScreen.SwapBuffers();
 
 		Sleep(17);
