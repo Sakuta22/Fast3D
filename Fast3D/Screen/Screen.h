@@ -5,9 +5,9 @@
 namespace Console3D {
 
 struct Screen {
-	static int width, height;
-	static float AspectRatio, PixelRatio;
-	static wchar_t* screen;
+	int width, height;
+	float AspectRatio, PixelRatio;
+	wchar_t* screen;
 
 	HANDLE Buffers[2];
 	int ActiveBuffer;
@@ -19,6 +19,7 @@ struct Screen {
 	void SetAspect();
 	void FreeScreen();
 	void SwapBuffers();
+	void FillBuffer();
 };
 
 }
