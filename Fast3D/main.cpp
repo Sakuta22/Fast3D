@@ -17,7 +17,7 @@ int main() {
 	Object Cube(cube);
 
 	vector<Console3D::Polygon> torus = generateTorus(1.5f, 0.33f, 36, 36);
-	vector<Console3D::Polygon> sphere = generateSphere(0.5f, 36, 36);
+	vector<Console3D::Polygon> sphere = generateSphere(0.6f, 36, 36);
 	Scene MScene({ torus, sphere, cube });
 
 	Camera MCamera(Point(0.f, 0.f, -3.5f), Vector(0.f, 0.f, 1.f), ViewPort());

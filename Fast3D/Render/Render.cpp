@@ -78,6 +78,8 @@ void Render::PrintPolygon(const Object WorldObject, wchar_t* buffer, const int& 
 			BufferPolygon.data.push_back(BufferPoint);
 		}
 
+		this->PolygonFilling(BufferPolygon, buffer, width, height);
+
 		int BPS = BufferPolygon.data.size();
 		for (int i = 0; i < BPS; i++) {
 			Point ScreenPoint1 = BufferPolygon.data[i].direction;
@@ -93,8 +95,8 @@ void Render::PrintLine(Point p1, Point p2, wchar_t* buffer, const int& width, co
 		std::swap(p1, p2);
 
 	if (abs(p2.x - p1.x) > abs(p2.y - p1.y)) {
-		float y = p1.y, dy = abs((p2.y - p1.y) / (p2.x - p1.x));
 		p1.x = round(p1.x), p2.x = round(p2.x);
+		float y = p1.y, dy = abs((p2.y - p1.y) / (p2.x - p1.x));
 		if (p1.x <= p2.x) {
 			for (int x = p1.x; x <= p2.x; x++, y += dy) {
 				if ((0 <= x && x < width) && (0 <= round(y) && round(y) < height))
@@ -109,11 +111,65 @@ void Render::PrintLine(Point p1, Point p2, wchar_t* buffer, const int& width, co
 		}
 	}
 	else {
-		float x = p1.x, dx = (p2.y - p1.y == 0.f ? 0.f : (p2.x - p1.x) / (p2.y - p1.y));
 		p1.y = round(p1.y), p2.y = round(p2.y);
+		float x = p1.x, dx = (p2.y - p1.y == 0.f ? 0.f : (p2.x - p1.x) / (p2.y - p1.y));
 		for (int y = p1.y; y <= p2.y; y++, x += dx) {
 			if ((0 <= round(x) && round(x) < width) && (0 <= y && y < height))
 				buffer[(int)(width * y + round(x))] = '*';
 		}
 	}
+}
+
+void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t* buffer, const int& width, const int& height) const
+{
+	int BPS = bufferPolygon.data.size();
+	for (int i = 0; i < BPS - 1; i += 2)
+	{
+		Point p1 = bufferPolygon.data[i].direction;
+		Point p2 = bufferPolygon.data[i + 1].direction;
+		Point p3 = bufferPolygon.data[(i + 2) % BPS].direction;
+
+		if (p2.y < p1.y)
+			std::swap(p2, p1);
+		if (p3.y < p1.y)
+			std::swap(p3, p1);
+		if (p3.y < p2.y)
+			std::swap(p3, p2);
+
+		std::vector<Point> long13 = Interpolate(p1, p3, width, height);
+		std::vector<Point> short1 = Interpolate(p1, p2, width, height);
+		std::vector<Point> short2 = Interpolate(p2, p3, width, height);
+
+		if (!short1.empty())
+			short1.pop_back();
+		for (Point p : short2)
+			short1.push_back(p);
+
+		if (long13.size() != short1.size())
+			exit(0);
+
+		for (int i = 0; i < long13.size(); i++) {
+			int y = long13[i].y;
+			int xs = min(long13[i].x, short1[i].x);
+			int xf = max(long13[i].x, short1[i].x);
+			for (int x = xs; x <= xf; x++) {
+				if ((0 <= x && x < width) && (0 <= y && y < height)) {
+					buffer[(int)(width * y + x)] = 'g';
+				}
+			}
+		}
+	}
+}
+
+std::vector<Point> Console3D::Render::Interpolate(Point p1, Point p2, const int& width, const int& height) const
+{
+	std::vector<Point> interpolate;
+
+	p1.y = round(p1.y), p2.y = round(p2.y);
+	float x = p1.x, dx = (p2.y - p1.y == 0.f ? 0.f : (p2.x - p1.x) / (p2.y - p1.y));
+	for (int y = p1.y; y <= p2.y; y++, x += dx) {
+		interpolate.push_back(Point(round(x), y, 0));
+	}
+
+	return interpolate;
 }

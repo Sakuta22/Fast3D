@@ -44,6 +44,10 @@ struct Render {
 
 	void PrintLine(Point p1, Point p2, wchar_t* buffer, const int& width, const int& height) const;
 
+	void PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t* buffer, const int& width, const int& height) const;
+
+	std::vector<Point> Interpolate(Point p1, Point p2, const int& width, const int& height) const;
+
 	enum class CullMode {
 		None,
 		Front,
