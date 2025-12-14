@@ -3,11 +3,16 @@ using namespace Console3D;
 
 Render::Render(Scene scene, Camera camera) : scene(scene), camera(camera) {}
 
-void Render::Start(wchar_t* buffer, const int& width, const int& height, const float& aspectRatio, const float& pixelRatio) const {
+void Console3D::Render::SetScreen(BaseScreen screen)
+{
+	this->screen = screen;
+}
+
+void Render::Start() const {
 	//this->zBuffer.Update(buffer, Screen::width * Screen::height);
 	
 	for (Object WorldObject : scene.data) {
-		this->PrintPolygon(WorldObject, buffer, width, height, aspectRatio, pixelRatio);
+		this->PrintPolygon(WorldObject);
 	}
 }
 
@@ -42,7 +47,7 @@ Vector Render::GetNormale(const Console3D::Polygon& WorldPolygon) const {
 	return Normal.Normalized();
 }
 
-void Render::PrintPolygon(const Object WorldObject, wchar_t* buffer, const int& width, const int& height, const float& aspectRatio, const float& pixelRatio) const {
+void Render::PrintPolygon(const Object WorldObject) const {
 	for (Console3D::Polygon WorldPolygon : WorldObject.data) {
 		if (this->settings.cullMode != Render::CullMode::None) {
 			Vector Normal = this->GetNormale(WorldPolygon);
@@ -69,28 +74,28 @@ void Render::PrintPolygon(const Object WorldObject, wchar_t* buffer, const int& 
 			ViewPortVector.direction.z = this->camera.viewport.deep;
 
 			//VIEWPORTVECTOR TO BUFFERPOINT
-			ViewPortVector.direction.x *= aspectRatio * pixelRatio;
+			ViewPortVector.direction.x *= this->screen.aspectRatio * this->screen.pixelRatio;
 			Point BufferPoint;
-			BufferPoint.x = width * (ViewPortVector.direction.x + this->camera.viewport.width / 2.f);
-			BufferPoint.y = height * (-ViewPortVector.direction.y + this->camera.viewport.height / 2.f);
+			BufferPoint.x = this->screen.width * (ViewPortVector.direction.x + this->camera.viewport.width / 2.f);
+			BufferPoint.y = this->screen.height * (-ViewPortVector.direction.y + this->camera.viewport.height / 2.f);
 
 			//PUSH TO BUFFERNPOINT TO BUFFERPOLYGON
 			BufferPolygon.data.push_back(BufferPoint);
 		}
 
-		this->PolygonFilling(BufferPolygon, buffer, width, height);
+		this->PolygonFilling(BufferPolygon);
 
 		int BPS = BufferPolygon.data.size();
 		for (int i = 0; i < BPS; i++) {
 			Point ScreenPoint1 = BufferPolygon.data[i].direction;
 			Point ScreenPoint2 = BufferPolygon.data[(i + 1) % BPS].direction;
 
-			PrintLine(ScreenPoint1, ScreenPoint2, buffer, width, height);
+			PrintLine(ScreenPoint1, ScreenPoint2);
 		}
 	}
 }
 
-void Render::PrintLine(Point p1, Point p2, wchar_t* buffer, const int& width, const int& height) const {
+void Render::PrintLine(Point p1, Point p2) const {
 	if (p1.y > p2.y)
 		std::swap(p1, p2);
 
@@ -99,14 +104,14 @@ void Render::PrintLine(Point p1, Point p2, wchar_t* buffer, const int& width, co
 		float y = p1.y, dy = abs((p2.y - p1.y) / (p2.x - p1.x));
 		if (p1.x <= p2.x) {
 			for (int x = p1.x; x <= p2.x; x++, y += dy) {
-				if ((0 <= x && x < width) && (0 <= round(y) && round(y) < height))
-					buffer[(int)(width * round(y) + x)] = '*';
+				if ((0 <= x && x < this->screen.width) && (0 <= round(y) && round(y) < this->screen.height))
+					this->screen.data[(int)(this->screen.width * round(y) + x)] = '*';
 			}
 		}
 		else {
 			for (int x = p1.x; x >= p2.x; x--, y += dy) {
-				if ((0 <= x && x < width) && (0 <= round(y) && round(y) < height))
-					buffer[(int)(width * round(y) + x)] = '*';
+				if ((0 <= x && x < this->screen.width) && (0 <= round(y) && round(y) < this->screen.height))
+					this->screen.data[(int)(this->screen.width * round(y) + x)] = '*';
 			}
 		}
 	}
@@ -114,13 +119,13 @@ void Render::PrintLine(Point p1, Point p2, wchar_t* buffer, const int& width, co
 		p1.y = round(p1.y), p2.y = round(p2.y);
 		float x = p1.x, dx = (p2.y - p1.y == 0.f ? 0.f : (p2.x - p1.x) / (p2.y - p1.y));
 		for (int y = p1.y; y <= p2.y; y++, x += dx) {
-			if ((0 <= round(x) && round(x) < width) && (0 <= y && y < height))
-				buffer[(int)(width * y + round(x))] = '*';
+			if ((0 <= round(x) && round(x) < this->screen.width) && (0 <= y && y < this->screen.height))
+				this->screen.data[(int)(this->screen.width * y + round(x))] = '*';
 		}
 	}
 }
 
-void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t* buffer, const int& width, const int& height) const
+void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon) const
 {
 	int BPS = bufferPolygon.data.size();
 	for (int i = 0; i < BPS - 1; i += 2)
@@ -136,9 +141,9 @@ void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t* bu
 		if (p3.y < p2.y)
 			std::swap(p3, p2);
 
-		std::vector<Point> long13 = Interpolate(p1, p3, width, height);
-		std::vector<Point> short1 = Interpolate(p1, p2, width, height);
-		std::vector<Point> short2 = Interpolate(p2, p3, width, height);
+		std::vector<Point> long13 = Interpolate(p1, p3);
+		std::vector<Point> short1 = Interpolate(p1, p2);
+		std::vector<Point> short2 = Interpolate(p2, p3);
 
 		if (!short1.empty())
 			short1.pop_back();
@@ -153,15 +158,15 @@ void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t* bu
 			int xs = min(long13[i].x, short1[i].x);
 			int xf = max(long13[i].x, short1[i].x);
 			for (int x = xs; x <= xf; x++) {
-				if ((0 <= x && x < width) && (0 <= y && y < height)) {
-					buffer[(int)(width * y + x)] = 'g';
+				if ((0 <= x && x < this->screen.width) && (0 <= y && y < this->screen.height)) {
+					this->screen.data[(int)(this->screen.width * y + x)] = '@';
 				}
 			}
 		}
 	}
 }
 
-std::vector<Point> Console3D::Render::Interpolate(Point p1, Point p2, const int& width, const int& height) const
+std::vector<Point> Console3D::Render::Interpolate(Point p1, Point p2) const
 {
 	std::vector<Point> interpolate;
 

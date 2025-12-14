@@ -17,8 +17,8 @@ int main() {
 	Object Cube(cube);
 
 	vector<Console3D::Polygon> torus = generateTorus(1.5f, 0.33f, 36, 36);
-	vector<Console3D::Polygon> sphere = generateSphere(0.6f, 36, 36);
-	Scene MScene({ torus, sphere, cube });
+	vector<Console3D::Polygon> sphere = generateSphere(0.5f, 36, 36);
+	Scene MScene({ torus, cube, sphere });
 
 	Camera MCamera(Point(0.f, 0.f, -3.5f), Vector(0.f, 0.f, 1.f), ViewPort());
 
@@ -34,6 +34,8 @@ int main() {
 	//render.settings.windingOrder = Render::WindingOrder::CounterClockwise;
 	while (true) {
 		MScreen.SetScreenNow();
+		render.SetScreen({ MScreen.screen, MScreen.width, MScreen.height });
+		render.screen.UpdateRatio();
 
 		render.scene.data[0].Rotation(mat);
 
@@ -43,7 +45,7 @@ int main() {
 		render.scene.data[2].Rotation(maty);
 		render.scene.data[2].Rotation(matz);
 
-		render.Start(MScreen.screen, MScreen.width, MScreen.height, MScreen.AspectRatio, MScreen.PixelRatio);
+		render.Start();
 		MScreen.FillBuffer();
 		MScreen.SwapBuffers();
 

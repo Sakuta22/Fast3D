@@ -14,11 +14,23 @@
 
 namespace Console3D {
 
+struct BaseScreen {
+	wchar_t* data;
+	int width;
+	int height;
+	float aspectRatio;
+	float pixelRatio;
+
+	void UpdateRatio() {
+		this->aspectRatio = (float)this->height / this->width;
+		this->pixelRatio = 24.f / 11.f;
+	}
+};
+
 struct Render {
 	Scene scene;
 	Camera camera;
-
-	
+	BaseScreen screen;
 
 	//struct ZBuffer { //Hidden Surface Removal
 	//	float* fBuffer;
@@ -36,17 +48,19 @@ struct Render {
 
 	Render(Scene scene, Camera camera);
 
-	void Start(wchar_t* buffer, const int& width, const int& height, const float& aspectRatio, const float& pixelRatio) const;
+	void SetScreen(BaseScreen screen);
+
+	void Start() const;
 
 	Vector GetNormale(const Console3D::Polygon& WorldPolygon) const;
 
-	void PrintPolygon(const Object WorldObject, wchar_t* buffer, const int& width, const int& height, const float& aspectRatio, const float& pixelRatio) const;
+	void PrintPolygon(const Object WorldObject) const;
 
-	void PrintLine(Point p1, Point p2, wchar_t* buffer, const int& width, const int& height) const;
+	void PrintLine(Point p1, Point p2) const;
 
-	void PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t* buffer, const int& width, const int& height) const;
+	void PolygonFilling(const Console3D::Polygon& bufferPolygon) const;
 
-	std::vector<Point> Interpolate(Point p1, Point p2, const int& width, const int& height) const;
+	std::vector<Point> Interpolate(Point p1, Point p2) const;
 
 	enum class CullMode {
 		None,
