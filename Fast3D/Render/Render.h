@@ -27,24 +27,37 @@ struct BaseScreen {
 	}
 };
 
+struct ZBuffer { //Hidden Surface Removal
+	BaseScreen* fBuffer;
+	float* zBuffer;
+
+	ZBuffer() : fBuffer(nullptr), zBuffer(nullptr) {};
+
+	ZBuffer(BaseScreen* frameBuffer) : zBuffer(nullptr) {
+		this->SetZBuffer(frameBuffer);
+	}
+		
+	void SetZBuffer(BaseScreen* frameBuffer) {
+		this->fBuffer = frameBuffer;
+
+		if (this->zBuffer != nullptr)
+			delete[] this->zBuffer;
+		zBuffer = new float[this->fBuffer->width * this->fBuffer->height];
+		std::fill(zBuffer, zBuffer + this->fBuffer->width * this->fBuffer->height, 0.f);
+	}
+
+	~ZBuffer() {
+		fBuffer = nullptr;
+		delete[] zBuffer;
+	}
+};
+
 struct Render {
 	Scene scene;
 	Camera camera;
 	BaseScreen screen;
 
-	//struct ZBuffer { //Hidden Surface Removal
-	//	float* fBuffer;
-	//	float* zBuffer;
-	//	float size;
-
-	//	ZBuffer(wchar_t& frameBuffer, float& size) : size(size) {
-	//		fBuffer = frameBuffer;
-	//		zBuffer = new float[size];
-	//	}
-
-
-	//};
-	//ZBuffer zBuffer;
+	ZBuffer zBuffer;
 
 	Render(Scene scene, Camera camera);
 

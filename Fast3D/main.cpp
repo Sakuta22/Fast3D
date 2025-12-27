@@ -31,6 +31,7 @@ int main() {
 	Matrix::CreateRotateMatrix(matz, Vector(1.f, 0.33f, 1.f).Normalized(), 2.f);
 
 	Render render(MScene, MCamera);
+	render.settings.cullMode = Render::CullMode::None;
 	//render.settings.windingOrder = Render::WindingOrder::CounterClockwise;
 	while (true) {
 		MScreen.SetScreenNow();

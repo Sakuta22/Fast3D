@@ -6,6 +6,7 @@ Render::Render(Scene scene, Camera camera) : scene(scene), camera(camera) {}
 void Console3D::Render::SetScreen(BaseScreen screen)
 {
 	this->screen = screen;
+	this->zBuffer.SetZBuffer(&this->screen);
 }
 
 void Render::Start() const {
