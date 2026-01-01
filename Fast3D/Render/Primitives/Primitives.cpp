@@ -33,9 +33,9 @@ std::vector<Console3D::Polygon> Console3D::generateSphere(float radius, int ring
 
 			spherePolys.push_back(Console3D::Polygon(std::vector<Vector>{
 				Point(x3, y3, z1),
-				Point(x2, y2, z1),
-				Point(x1, y1, z0),
 				Point(x0, y0, z0),
+				Point(x1, y1, z0),
+				Point(x2, y2, z1),
 			}));
 		}
 	}

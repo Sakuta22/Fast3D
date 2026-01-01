@@ -14,11 +14,11 @@ int main() {
 		Console3D::Polygon(vector<Vector> {Point(-0.5f,  0.5f,  0.5f), Point( 0.5f,  0.5f,  0.5f), Point( 0.5f,  0.5f, -0.5f), Point(-0.5f,  0.5f, -0.5f)}), //top
 		Console3D::Polygon(vector<Vector> {Point(-0.5f, -0.5f, -0.5f), Point( 0.5f, -0.5f, -0.5f), Point( 0.5f, -0.5f,  0.5f), Point(-0.5f, -0.5f,  0.5f)}), //bottom
 	};
-	Object Cube(cube);
+	Object Cube(cube, L'*', L'2');
 
 	vector<Console3D::Polygon> torus = generateTorus(1.5f, 0.33f, 36, 36);
-	vector<Console3D::Polygon> sphere = generateSphere(0.5f, 36, 36);
-	Scene MScene({ torus, cube, sphere });
+	vector<Console3D::Polygon> sphere = generateSphere(0.7f, 36, 36);
+	Scene MScene({ {torus, L'*', L'$'}, Cube, {sphere, L'*', L'`'} });
 
 	Camera MCamera(Point(0.f, 0.f, -3.5f), Vector(0.f, 0.f, 1.f), ViewPort());
 
@@ -31,12 +31,13 @@ int main() {
 	Matrix::CreateRotateMatrix(matz, Vector(1.f, 0.33f, 1.f).Normalized(), 2.f);
 
 	Render render(MScene, MCamera);
-	render.settings.cullMode = Render::CullMode::None;
+	render.settings.cullMode = Render::CullMode::Back;
 	//render.settings.windingOrder = Render::WindingOrder::CounterClockwise;
 	while (true) {
 		MScreen.SetScreenNow();
 		render.SetScreen({ MScreen.screen, MScreen.width, MScreen.height });
 		render.screen.UpdateRatio();
+		render.zBuffer.SetZBuffer(&render.screen);
 
 		render.scene.data[0].Rotation(mat);
 

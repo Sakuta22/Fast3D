@@ -60,9 +60,11 @@ void Render::PrintPolygon(const Object WorldObject) const {
 			case Render::CullMode::Front:
 				if (DotProduct < 0.f)
 					continue;
+				break;
 			case Render::CullMode::Back:
 				if (DotProduct > 0.f)
 					continue;
+				break;
 			}
 		}
 
@@ -72,61 +74,82 @@ void Render::PrintPolygon(const Object WorldObject) const {
 			Vector ViewPortVector;
 			ViewPortVector.direction.x = (WorldVector.direction.x - this->camera.position.x) * this->camera.viewport.deep / (WorldVector.direction.z - this->camera.position.z);
 			ViewPortVector.direction.y = (WorldVector.direction.y - this->camera.position.y) * this->camera.viewport.deep / (WorldVector.direction.z - this->camera.position.z);
-			ViewPortVector.direction.z = this->camera.viewport.deep;
+			ViewPortVector.direction.z = WorldVector.direction.z;
 
 			//VIEWPORTVECTOR TO BUFFERPOINT
 			ViewPortVector.direction.x *= this->screen.aspectRatio * this->screen.pixelRatio;
 			Point BufferPoint;
 			BufferPoint.x = this->screen.width * (ViewPortVector.direction.x + this->camera.viewport.width / 2.f);
 			BufferPoint.y = this->screen.height * (-ViewPortVector.direction.y + this->camera.viewport.height / 2.f);
+			BufferPoint.z = ViewPortVector.direction.z;
 
 			//PUSH TO BUFFERNPOINT TO BUFFERPOLYGON
 			BufferPolygon.data.push_back(BufferPoint);
 		}
 
-		this->PolygonFilling(BufferPolygon);
+		this->PolygonFilling(BufferPolygon, WorldObject.colorFill);
 
 		int BPS = BufferPolygon.data.size();
 		for (int i = 0; i < BPS; i++) {
 			Point ScreenPoint1 = BufferPolygon.data[i].direction;
 			Point ScreenPoint2 = BufferPolygon.data[(i + 1) % BPS].direction;
 
-			PrintLine(ScreenPoint1, ScreenPoint2);
+			PrintLine(ScreenPoint1, ScreenPoint2, WorldObject.colorStroke);
 		}
 	}
 }
 
-void Render::PrintLine(Point p1, Point p2) const {
+void Render::PrintLine(Point p1, Point p2, wchar_t color) const {
 	if (p1.y > p2.y)
 		std::swap(p1, p2);
 
 	if (abs(p2.x - p1.x) > abs(p2.y - p1.y)) {
 		p1.x = round(p1.x), p2.x = round(p2.x);
 		float y = p1.y, dy = abs((p2.y - p1.y) / (p2.x - p1.x));
+		float z = p1.z, dz = (p2.z - p1.z) / abs(p2.x - p1.x);
 		if (p1.x <= p2.x) {
-			for (int x = p1.x; x <= p2.x; x++, y += dy) {
-				if ((0 <= x && x < this->screen.width) && (0 <= round(y) && round(y) < this->screen.height))
-					this->screen.data[(int)(this->screen.width * round(y) + x)] = '*';
+			for (int x = p1.x; x <= p2.x; x++, y += dy, z += dz) {
+				if ((0 <= x && x < this->screen.width) && (0 <= round(y) && round(y) < this->screen.height)) {
+					//this->screen.data[(int)(this->screen.width * round(y) + x)] = color;
+
+					if (this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] > z) {
+						this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] = z;
+						this->zBuffer.fBuffer->data[(int)(this->screen.width * round(y) + x)] = color;
+					}
+				}
 			}
 		}
 		else {
-			for (int x = p1.x; x >= p2.x; x--, y += dy) {
-				if ((0 <= x && x < this->screen.width) && (0 <= round(y) && round(y) < this->screen.height))
-					this->screen.data[(int)(this->screen.width * round(y) + x)] = '*';
+			for (int x = p1.x; x >= p2.x; x--, y += dy, z += dz) {
+				if ((0 <= x && x < this->screen.width) && (0 <= round(y) && round(y) < this->screen.height)) {
+					//this->screen.data[(int)(this->screen.width * round(y) + x)] = color;
+
+					if (this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] > z) {
+						this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] = z;
+						this->zBuffer.fBuffer->data[(int)(this->screen.width * round(y) + x)] = color;
+					}
+				}
 			}
 		}
 	}
 	else {
 		p1.y = round(p1.y), p2.y = round(p2.y);
 		float x = p1.x, dx = (p2.y - p1.y == 0.f ? 0.f : (p2.x - p1.x) / (p2.y - p1.y));
+		float z = p1.z, dz = (p2.z - p1.z) / abs(p2.y - p1.y);
 		for (int y = p1.y; y <= p2.y; y++, x += dx) {
-			if ((0 <= round(x) && round(x) < this->screen.width) && (0 <= y && y < this->screen.height))
-				this->screen.data[(int)(this->screen.width * y + round(x))] = '*';
+			if ((0 <= round(x) && round(x) < this->screen.width) && (0 <= y && y < this->screen.height)) {
+				//this->screen.data[(int)(this->screen.width * y + round(x))] = color;
+
+				if (this->zBuffer.zBuffer[(int)(this->screen.width * y + round(x))] > z) {
+					this->zBuffer.zBuffer[(int)(this->screen.width * y + round(x))] = z;
+					this->zBuffer.fBuffer->data[(int)(this->screen.width * y + round(x))] = color;
+				}
+			}
 		}
 	}
 }
 
-void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon) const
+void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t color) const
 {
 	int BPS = bufferPolygon.data.size();
 	for (int i = 0; i < BPS - 1; i += 2)
@@ -158,9 +181,15 @@ void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon) const
 			int y = long13[i].y;
 			int xs = min(long13[i].x, short1[i].x);
 			int xf = max(long13[i].x, short1[i].x);
+			float z = long13[i].z;
 			for (int x = xs; x <= xf; x++) {
 				if ((0 <= x && x < this->screen.width) && (0 <= y && y < this->screen.height)) {
-					this->screen.data[(int)(this->screen.width * y + x)] = '@';
+					//this->screen.data[(int)(this->screen.width * y + x)] = color;
+
+					if (this->zBuffer.zBuffer[(int)(this->screen.width * y + x)] > z) {
+						this->zBuffer.zBuffer[(int)(this->screen.width * y + x)] = z;
+						this->zBuffer.fBuffer->data[(int)(this->screen.width * y + x)] = color;
+					}
 				}
 			}
 		}
@@ -173,9 +202,24 @@ std::vector<Point> Console3D::Render::Interpolate(Point p1, Point p2) const
 
 	p1.y = round(p1.y), p2.y = round(p2.y);
 	float x = p1.x, dx = (p2.y - p1.y == 0.f ? 0.f : (p2.x - p1.x) / (p2.y - p1.y));
-	for (int y = p1.y; y <= p2.y; y++, x += dx) {
-		interpolate.push_back(Point(round(x), y, 0));
+	float z = p1.z, dz = (p2.z - p1.z) / abs(p2.y - p1.y);
+	for (int y = p1.y; y <= p2.y; y++, x += dx, z += dz) {
+		interpolate.push_back(Point(round(x), y, z));
 	}
 
 	return interpolate;
+}
+
+std::vector<Point> Console3D::Render::Interpolate2(float i0, float d0, float i1, float d1)
+{
+	std::vector<Point> values;
+
+	float step = (d1 - d0) / (i1 - i0);
+	float d = d0;
+	for (i0; i0 <= i1; i0++) {
+		values.push_back(d);
+		d += step;
+	}
+
+	return values;
 }
