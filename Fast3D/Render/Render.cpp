@@ -74,7 +74,7 @@ void Render::PrintPolygon(const Object WorldObject) const {
 			Vector ViewPortVector;
 			ViewPortVector.direction.x = (WorldVector.direction.x - this->camera.position.x) * this->camera.viewport.deep / (WorldVector.direction.z - this->camera.position.z);
 			ViewPortVector.direction.y = (WorldVector.direction.y - this->camera.position.y) * this->camera.viewport.deep / (WorldVector.direction.z - this->camera.position.z);
-			ViewPortVector.direction.z = WorldVector.direction.z;
+			ViewPortVector.direction.z = 1.f / (WorldVector.direction.z - this->camera.position.z);
 
 			//VIEWPORTVECTOR TO BUFFERPOINT
 			ViewPortVector.direction.x *= this->screen.aspectRatio * this->screen.pixelRatio;
@@ -89,13 +89,13 @@ void Render::PrintPolygon(const Object WorldObject) const {
 
 		this->PolygonFilling(BufferPolygon, WorldObject.colorFill);
 
-		int BPS = BufferPolygon.data.size();
+		/*int BPS = BufferPolygon.data.size();
 		for (int i = 0; i < BPS; i++) {
 			Point ScreenPoint1 = BufferPolygon.data[i].direction;
 			Point ScreenPoint2 = BufferPolygon.data[(i + 1) % BPS].direction;
 
 			PrintLine(ScreenPoint1, ScreenPoint2, WorldObject.colorStroke);
-		}
+		}*/
 	}
 }
 
@@ -112,7 +112,7 @@ void Render::PrintLine(Point p1, Point p2, wchar_t color) const {
 				if ((0 <= x && x < this->screen.width) && (0 <= round(y) && round(y) < this->screen.height)) {
 					//this->screen.data[(int)(this->screen.width * round(y) + x)] = color;
 
-					if (this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] > z) {
+					if (this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] < z) {
 						this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] = z;
 						this->zBuffer.fBuffer->data[(int)(this->screen.width * round(y) + x)] = color;
 					}
@@ -124,7 +124,7 @@ void Render::PrintLine(Point p1, Point p2, wchar_t color) const {
 				if ((0 <= x && x < this->screen.width) && (0 <= round(y) && round(y) < this->screen.height)) {
 					//this->screen.data[(int)(this->screen.width * round(y) + x)] = color;
 
-					if (this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] > z) {
+					if (this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] < z) {
 						this->zBuffer.zBuffer[(int)(this->screen.width * round(y) + x)] = z;
 						this->zBuffer.fBuffer->data[(int)(this->screen.width * round(y) + x)] = color;
 					}
@@ -140,7 +140,7 @@ void Render::PrintLine(Point p1, Point p2, wchar_t color) const {
 			if ((0 <= round(x) && round(x) < this->screen.width) && (0 <= y && y < this->screen.height)) {
 				//this->screen.data[(int)(this->screen.width * y + round(x))] = color;
 
-				if (this->zBuffer.zBuffer[(int)(this->screen.width * y + round(x))] > z) {
+				if (this->zBuffer.zBuffer[(int)(this->screen.width * y + round(x))] < z) {
 					this->zBuffer.zBuffer[(int)(this->screen.width * y + round(x))] = z;
 					this->zBuffer.fBuffer->data[(int)(this->screen.width * y + round(x))] = color;
 				}
@@ -181,12 +181,17 @@ void Render::PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t col
 			int y = long13[i].y;
 			int xs = min(long13[i].x, short1[i].x);
 			int xf = max(long13[i].x, short1[i].x);
-			float z = long13[i].z;
-			for (int x = xs; x <= xf; x++) {
+			float z = long13[i].z, dz = -(short1[i].z - z) / (xf - xs);
+			if (xs == long13[i].x)
+				z = long13[i].z, dz = (xf == xs ? 0.f : (short1[i].z - z) / (float)(xf - xs));
+			else
+				z = short1[i].z, dz = (xf == xs ? 0.f : (long13[i].z - z) / (float)(xf - xs));
+				
+			for (int x = xs; x <= xf; x++, z += dz) {
 				if ((0 <= x && x < this->screen.width) && (0 <= y && y < this->screen.height)) {
 					//this->screen.data[(int)(this->screen.width * y + x)] = color;
 
-					if (this->zBuffer.zBuffer[(int)(this->screen.width * y + x)] > z) {
+					if (this->zBuffer.zBuffer[(int)(this->screen.width * y + x)] < z) {
 						this->zBuffer.zBuffer[(int)(this->screen.width * y + x)] = z;
 						this->zBuffer.fBuffer->data[(int)(this->screen.width * y + x)] = color;
 					}

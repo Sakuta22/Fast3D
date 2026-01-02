@@ -43,7 +43,7 @@ struct ZBuffer { //Hidden Surface Removal
 		if (this->zBuffer != nullptr)
 			delete[] this->zBuffer;
 		zBuffer = new float[this->fBuffer->width * this->fBuffer->height];
-		std::fill(zBuffer, zBuffer + this->fBuffer->width * this->fBuffer->height, 99999.f);
+		std::fill(zBuffer, zBuffer + this->fBuffer->width * this->fBuffer->height, 0.f);
 	}
 
 	~ZBuffer() {
