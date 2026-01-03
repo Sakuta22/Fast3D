@@ -27,24 +27,37 @@ struct BaseScreen {
 	}
 };
 
+struct ZBuffer { //Hidden Surface Removal
+	BaseScreen* fBuffer;
+	float* zBuffer;
+
+	ZBuffer() : fBuffer(nullptr), zBuffer(nullptr) {};
+
+	ZBuffer(BaseScreen* frameBuffer) : zBuffer(nullptr) {
+		this->SetZBuffer(frameBuffer);
+	}
+
+	void SetZBuffer(BaseScreen* frameBuffer) {
+		this->fBuffer = frameBuffer;
+
+		if (this->zBuffer != nullptr)
+			delete[] this->zBuffer;
+		zBuffer = new float[this->fBuffer->width * this->fBuffer->height];
+		std::fill(zBuffer, zBuffer + this->fBuffer->width * this->fBuffer->height, 0.f);
+	}
+
+	~ZBuffer() {
+		fBuffer = nullptr;
+		delete[] zBuffer;
+	}
+};
+
 struct Render {
 	Scene scene;
 	Camera camera;
 	BaseScreen screen;
 
-	//struct ZBuffer { //Hidden Surface Removal
-	//	float* fBuffer;
-	//	float* zBuffer;
-	//	float size;
-
-	//	ZBuffer(wchar_t& frameBuffer, float& size) : size(size) {
-	//		fBuffer = frameBuffer;
-	//		zBuffer = new float[size];
-	//	}
-
-
-	//};
-	//ZBuffer zBuffer;
+	ZBuffer zBuffer;
 
 	Render(Scene scene, Camera camera);
 
@@ -56,11 +69,12 @@ struct Render {
 
 	void PrintPolygon(const Object WorldObject) const;
 
-	void PrintLine(Point p1, Point p2) const;
+	void PrintLine(Point p1, Point p2, wchar_t color) const;
 
-	void PolygonFilling(const Console3D::Polygon& bufferPolygon) const;
+	void PolygonFilling(const Console3D::Polygon& bufferPolygon, wchar_t color) const;
 
 	std::vector<Point> Interpolate(Point p1, Point p2) const;
+	static std::vector<Point> Interpolate2(float i0, float d0, float i1, float d1);
 
 	enum class CullMode {
 		None,
