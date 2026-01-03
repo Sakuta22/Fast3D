@@ -6,12 +6,6 @@ using namespace std;
 using namespace Console3D;
 
 int main() {
-	/*vector<Console3D::Polygon> qwe = {
-		vector<Vector> { Point(-0.5f, -0.5f, 0), Point(-0.5f, 0.5f, 0), Point(0.5f, -0.5f, 0) },
-	};
-	Object test1(qwe, L'*', '`');
-	Object test2(qwe, L'*', '*');*/
-
 	vector<Console3D::Polygon> cube = {
 		Console3D::Polygon(vector<Vector> {Point(-0.5f, -0.5f, -0.5f), Point(-0.5f,  0.5f, -0.5f), Point( 0.5f,  0.5f, -0.5f), Point( 0.5f, -0.5f, -0.5f)}), //front
 		Console3D::Polygon(vector<Vector> {Point( 0.5f,  0.5f, -0.5f), Point( 0.5f,  0.5f,  0.5f), Point( 0.5f, -0.5f,  0.5f), Point( 0.5f, -0.5f, -0.5f)}), //right
@@ -24,7 +18,6 @@ int main() {
 	vector<Console3D::Polygon> torus = generateTorus(1.5f, 0.33f, 36, 36);
 	vector<Console3D::Polygon> sphere = generateSphere(0.6f, 36, 36);
 	Scene MScene({ {torus, L'*', L'@'}, Cube, {sphere, L'*', L'`'} });
-	//Scene MScene({ test1, test2 });
 
 	Camera MCamera(Point(0.f, 0.f, -3.5f), Vector(0.f, 0.f, 1.f), ViewPort());
 
@@ -39,26 +32,26 @@ int main() {
 	Render render(MScene, MCamera);
 	render.settings.cullMode = Render::CullMode::Back;
 	//render.settings.windingOrder = Render::WindingOrder::CounterClockwise;
+	float w = 0.f;
 	while (true) {
 		MScreen.SetScreenNow();
 		render.SetScreen({ MScreen.screen, MScreen.width, MScreen.height });
 		render.screen.UpdateRatio();
 		render.zBuffer.SetZBuffer(&render.screen);
-		
-		//render.scene.data[0].Rotation(maty);
-		//render.scene.data[1].Rotation(mat);
 
 		render.scene.data[0].Rotation(mat);
-
 		render.scene.data[1].Rotation(matx);
 		render.scene.data[1].Rotation(matz);
-
-		//render.scene.data[2].Rotation(maty);
-		//render.scene.data[2].Rotation(matz);
+		render.scene.data[2].Rotation(maty);
+		render.scene.data[2].Rotation(matz);
 
 		render.Start();
 		MScreen.FillBuffer();
 		MScreen.SwapBuffers();
+
+		//render.camera.MoveToDiff(0.f, 0.f, -sinf(w) * cosf(w));
+		//w += 0.1f;
+		//render.camera.MoveToDiff(0.f, 0.f, sinf(w) * -cosf(w));
 
 		Sleep(17);
 	}
