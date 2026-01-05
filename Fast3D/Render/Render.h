@@ -1,5 +1,9 @@
 #pragma once
+#include <iostream>
+#include <sstream>
 #include <Windows.h>	
+#include <chrono>
+
 #include "Point/Point.h"
 #include "Vector/Vector.h"
 #include "Matrix/Matrix.h"
@@ -52,11 +56,19 @@ struct ZBuffer { //Hidden Surface Removal
 	}
 };
 
+//struct DebugWindow {
+//	///
+//
+//	void PrintInfo() {
+//		std::wstringstream wss;
+//		wss << 
+//	}
+//};
+
 struct Render {
 	Scene scene;
 	Camera camera;
 	BaseScreen screen;
-
 	ZBuffer zBuffer;
 
 	Render(Scene scene, Camera camera);
