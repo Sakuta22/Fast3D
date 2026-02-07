@@ -56,6 +56,40 @@ struct ZBuffer { //Hidden Surface Removal
 	}
 };
 
+struct TickSystem {
+	float tickRate;
+	float accumulator;
+	std::chrono::steady_clock::time_point timeThen;
+
+	TickSystem(float tickRate = 1.f / 60.f) : tickRate(tickRate), accumulator(0.f) {
+		this->Restart();
+	};
+
+	void Restart() {
+		this->timeThen = std::chrono::steady_clock::now();
+	}
+
+	float Update() {
+		auto timeNow = std::chrono::steady_clock::now();
+		float deltaTime = std::chrono::duration<float>(timeNow - this->timeThen).count();
+		this->timeThen = timeNow;
+
+		this->accumulator += deltaTime;
+		this->accumulator = min(this->accumulator, 0.25f);
+
+		return deltaTime;
+	}
+
+	bool NeedATick() {
+		if (this->accumulator >= this->tickRate) {
+			this->accumulator -= this->tickRate;
+			return true;
+		}
+
+		return false;
+	}
+};
+
 //struct DebugWindow {
 //	///
 //
@@ -70,6 +104,8 @@ struct Render {
 	Camera camera;
 	BaseScreen screen;
 	ZBuffer zBuffer;
+
+	//TickSystem tickSystem;
 
 	Render(Scene scene, Camera camera);
 
@@ -99,6 +135,8 @@ struct Render {
 	};
 //private:
 	struct Settings {
+		
+
 		Render::CullMode cullMode = Render::CullMode::Back;
 		Render::WindingOrder windingOrder = Render::WindingOrder::Clockwise;
 	};

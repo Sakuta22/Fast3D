@@ -10,7 +10,7 @@ void Console3D::Render::SetScreen(BaseScreen screen)
 }
 
 void Render::Start() const {
-	//this->zBuffer.Update(buffer, Screen::width * Screen::height);
+	
 
 	for (Object WorldObject : scene.data) {
 		this->PrintPolygon(WorldObject);

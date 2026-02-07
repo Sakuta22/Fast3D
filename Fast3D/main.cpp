@@ -20,7 +20,7 @@ int main() {
 	vector<Console3D::Polygon> sphere = generateSphere(0.65f, 36, 36);
 	Scene MScene({ {torus, L'*', L'@'}, Cube, {sphere, L'*', L'`'} });
 
-	Camera MCamera(Point(0.f, 0.f, -3.5f), Vector(0.f, 0.f, 1.f), ViewPort());
+	Camera MCamera(Point(0.f, 0.f, -2.5f), Vector(0.f, 0.f, 1.f), ViewPort());
 
 	Screen MScreen;
 	
@@ -31,20 +31,17 @@ int main() {
 	Matrix::CreateRotateMatrix(matz, Vector(1.f, 0.33f, 1.f).Normalized(), 1.f);
 
 	Render render(MScene, MCamera);
+	TickSystem tickSystem(1.f / 30.f);
 	render.settings.cullMode = Render::CullMode::Back;
 	//render.settings.windingOrder = Render::WindingOrder::CounterClockwise;
 	float w = 0.f;
 
 	float titletime = 0.f;
 
-	const float TICK_RATE = 1.f / 60.f;
-	float accumulator = 0.f;
 	float avgfps = 0.f, cntframe = 0.f;
-	auto lasttime = std::chrono::steady_clock::now();
+	tickSystem.Restart();
 	while (true) {
-		auto currenttime = std::chrono::steady_clock::now();
-		float deltatime = std::chrono::duration<float>(currenttime - lasttime).count();
-		lasttime = currenttime;
+		float deltatime = tickSystem.Update();
 
 		avgfps += (cntframe == 0 ? 40 : 1.f / deltatime);
 		cntframe++;
@@ -60,8 +57,7 @@ int main() {
 			titletime = 0.f;
 		}
 
-		accumulator += deltatime;
-		while (accumulator >= TICK_RATE) {
+		while (tickSystem.NeedATick()) {
 
 			render.scene.data[0].Rotation(mat);
 			render.scene.data[1].Rotation(matx);
@@ -70,11 +66,9 @@ int main() {
 			render.scene.data[2].Rotation(matz);
 
 
-			//render.camera.MoveToDiff(0.f, 0.f, -sinf(w) * cosf(w) / 5.f);
-			//w += 0.1f;
-			//render.camera.MoveToDiff(0.f, 0.f, sinf(w) * -cosf(w) / 5.f);
-
-			accumulator -= TICK_RATE;
+			render.camera.MoveToDiff(0.f, 0.f, -sinf(w) * cosf(w) / 5.f);
+			w += 0.1f;
+			render.camera.MoveToDiff(0.f, 0.f, sinf(w) * -cosf(w) / 5.f);
 		}
 		MScreen.SetScreenNow();
 		render.SetScreen({ MScreen.screen, MScreen.width, MScreen.height });
