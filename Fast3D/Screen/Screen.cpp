@@ -35,7 +35,7 @@ void Screen::SetScreenNow() {
 			screen = nullptr;
 		}
 		screen = new wchar_t[this->width * this->height];
-
+			
 		COORD coord = { this->width, this->height };
 		SetConsoleScreenBufferSize(this->Buffers[0], coord);
 		SetConsoleScreenBufferSize(this->Buffers[1], coord);
